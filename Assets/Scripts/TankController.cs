@@ -8,7 +8,7 @@ public class TankController : MonoBehaviour
     public float m_Speed = 12f;
     public float m_TurnSpeed = 180f;
     public float m_WheelRotateSpeed = 90f;
-
+    public TrailRenderer[] tank_trackMarks;
     private Rigidbody m_Rigidbody;              // Reference used to move the tank.
     private string m_MovementAxisName;          // The name of the input axis for moving forward and back.
     private string m_TurnAxisName;              // The name of the input axis for turning.
@@ -145,6 +145,35 @@ public class TankController : MonoBehaviour
             pointToLookAt.y = m_turret.transform.position.y;
             //Debug.Log($"pointToLookAt: {pointToLookAt}");
             m_turret.transform.rotation = Quaternion.LookRotation(pointToLookAt - m_turret.transform.position);
+        }
+    }
+
+    private void IsMoving()
+    {
+        if (m_MovementInputValue != 0)
+        {
+            StartEmittingTrackMarks();
+        }
+        else
+        {
+            StopEmittingTrackMarks();
+        }
+    }
+    private void StartEmittingTrackMarks()
+    {
+        //Debug.Log("RenderTrackMarks");
+            foreach (var trackMark in tank_trackMarks)
+            {
+                trackMark.emitting = true;
+            }
+    }
+
+    private void StopEmittingTrackMarks()
+    {
+        //Debug.Log("RenderTrackMarks");
+        foreach (var trackMark in tank_trackMarks)
+        {
+            trackMark.emitting = false;
         }
     }
 }
