@@ -5141,6 +5141,7 @@ MonoBehaviour:
   m_MinLaunchForce: 15
   m_MaxLaunchForce: 30
   m_MaxChargeTime: 0.75
+  smokeBurstParticlesPrefab: {fileID: 6620772657333620091, guid: 42830e8d894b3fa4db01fb026f97be7f, type: 3}
 --- !u!1 &6459529632077896111
 GameObject:
   m_ObjectHideFlags: 0
@@ -5278,7 +5279,6 @@ MonoBehaviour:
   m_Speed: 12
   m_TurnSpeed: 180
   m_WheelRotateSpeed: 180
-  tankDust: {fileID: 6620772657333620091, guid: 52bc897cca7fd2442b3b7fe3c239719c, type: 3}
 --- !u!1 &6459529632229900289
 GameObject:
   m_ObjectHideFlags: 0

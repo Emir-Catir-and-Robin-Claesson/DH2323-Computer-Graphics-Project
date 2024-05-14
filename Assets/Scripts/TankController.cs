@@ -9,7 +9,6 @@ public class TankController : MonoBehaviour
     public float m_TurnSpeed = 180f;
     public float m_WheelRotateSpeed = 90f;
 
-    public ParticleSystem tankDust;
 
     private Rigidbody m_Rigidbody;              // Reference used to move the tank.
     private string m_MovementAxisName;          // The name of the input axis for moving forward and back.
