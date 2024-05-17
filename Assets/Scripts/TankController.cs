@@ -30,7 +30,7 @@ public class TankController : MonoBehaviour
     private GameObject m_turret;
     private float camRayLength = 100f;          // The length of the ray from the camera into the scene.
     private List<ParticleSystem> wheelDustParticleSystems = new List<ParticleSystem>(); // List of wheel dust particle systems
-
+    private List<GameObject> m_trackMarkspawnPoints = new List<GameObject>();
     private void Awake()
     {
         // Create a layer mask for the floor layer.
@@ -53,20 +53,13 @@ public class TankController : MonoBehaviour
                 m_turret = children[i].gameObject;
             }
 
-            // Get ORUGAS
-            if (children[i].name.Contains("ORUGA"))
-            {
-                m_orugas.Add(children[i].gameObject);
-            }
-
             // Get spawnPoints
             if (children[i].name.Contains("TrackSpawnPoint"))
             {
-                m_trackMarkpawnPoints.Add(children[i].gameObject);
+                m_trackMarkspawnPoints.Add(children[i].gameObject);
             }
 
         }
-        timeLastPoll = Time.time;
         
         foreach (var wheel in m_wheels)
         {
@@ -214,7 +207,7 @@ public class TankController : MonoBehaviour
 
     private void SpawnSkidMarks()
     {
-        foreach (var spawnPoint in m_trackMarkpawnPoints)
+        foreach (var spawnPoint in m_trackMarkspawnPoints)
         {
             Vector3 position = spawnPoint.transform.position;
             position.y = -0.1f;
