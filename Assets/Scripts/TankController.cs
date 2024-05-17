@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
+using UnityEngine.UIElements;
 
 [RequireComponent(typeof(Rigidbody))]
 public class TankController : MonoBehaviour
@@ -10,10 +12,11 @@ public class TankController : MonoBehaviour
     public float m_Speed = 12f;
     public float m_TurnSpeed = 180f;
     public float m_WheelRotateSpeed = 90f;
-    //public TrailRenderer[] tank_trackMarks;     //First attempt at track marks
+    public TrailRenderer[] tank_trackMarks;     //First attempt at track marks
     public GameObject skidMarksPrefab;
     public float despawnTime = 3f;
     public float xOffset = 0.1f;
+    public float zOffset = 0.1f;
     
     private Rigidbody m_Rigidbody;              // Reference used to move the tank.
     private string m_MovementAxisName;          // The name of the input axis for moving forward and back.
@@ -27,9 +30,12 @@ public class TankController : MonoBehaviour
     private float camRayLength = 100f;          // The length of the ray from the camera into the scene.
     
     private List<GameObject> m_orugas = new List<GameObject>();
-    private List<GameObject> trackMarks = new List<GameObject>();
+    private List<GameObject> m_trackMarkpawnPoints = new List<GameObject>();
+    private List<float> trackMarksTimeStamp = new List<float>();
     private Queue<GameObject> trackMarksQueue = new Queue<GameObject>();
-    private float spawnTime;
+
+    private float pollingTime = 2;
+    private float timeLastPoll;
 
 
 
@@ -61,7 +67,14 @@ public class TankController : MonoBehaviour
                 m_orugas.Add(children[i].gameObject);
             }
 
+            // Get spawnPoints
+            if (children[i].name.Contains("TrackSpawnPoint"))
+            {
+                m_trackMarkpawnPoints.Add(children[i].gameObject);
+            }
+
         }
+        timeLastPoll = Time.time;
     }
 
     // Start is called before the first frame update
@@ -79,13 +92,6 @@ public class TankController : MonoBehaviour
         m_TurnInputValue = Input.GetAxis(m_TurnAxisName);
         m_MouseInputValue = Input.mousePosition;
         IsMoving();
-        //DespawnTrackMark();
-        /*if (Time.time - lastSpawnTime >= despawnTime)
-        {
-            DespawnTrackMark();
-            lastSpawnTime = Time.time;
-        }
-        */
     }
 
     private void FixedUpdate()
@@ -96,12 +102,6 @@ public class TankController : MonoBehaviour
         RotateWheels();
         RotateTurret();
         IsMoving();
-        if (Time.time - spawnTime >= despawnTime)
-        {
-            DespawnTrackMark();
-            spawnTime = Time.time;
-        }
-        DespawnTrackMark();
     }
 
 
@@ -174,7 +174,6 @@ public class TankController : MonoBehaviour
             // Your code here.
             Vector3 pointToLookAt = floorHit.point;
             pointToLookAt.y = m_turret.transform.position.y;
-            //Debug.Log($"pointToLookAt: {pointToLookAt}");
             m_turret.transform.rotation = Quaternion.LookRotation(pointToLookAt - m_turret.transform.position);
         }
     }
@@ -183,41 +182,24 @@ public class TankController : MonoBehaviour
     {
         if (m_MovementInputValue != 0)
         {
-            //StartEmittingTrackMarks();
             SpawnSkidMarks();
         }
         else
         {
-            //StopEmittingTrackMarks();
         }
     }
 
     private void SpawnSkidMarks()
     {
-        //Debug.Log($"Number of orugas {m_orugas.Count}");
-        foreach (var oruga in m_orugas)
+        foreach (var spawnPoint in m_trackMarkpawnPoints)
         {
-            Vector3 position = oruga.transform.position;
-            position.x += xOffset;
-            //Quaternion rotation = Quaternion.FromToRotation(Vector3.up, position);
-            Quaternion rotation = Quaternion.FromToRotation(-oruga.transform.right, Vector3.up);
+            Vector3 position = spawnPoint.transform.position;
+            position.y = -0.1f;
+            Vector3 tankRotation = transform.rotation.eulerAngles;
+            Quaternion rotation = Quaternion.Euler(90, 0, 0);
+            rotation.SetLookRotation(-Vector3.up, spawnPoint.transform.up);
             GameObject trackMark = Instantiate(skidMarksPrefab, position, rotation);
-            //trackMarks.Add(trackMark);
-            trackMarksQueue.Enqueue(trackMark);
-            spawnTime = Time.time;
-        }     
-        
-    }
-
-    private void DespawnTrackMark()
-    {
-        //List<GameObject> marks = new List<GameObject>();
-        // Destroy a track mark (for every wheel) after a certain amount of time.
-        if (trackMarksQueue.Count > 0)
-        { 
-            GameObject mark = trackMarksQueue.Dequeue();
-            Destroy(mark);
-            Debug.Log($"Destroyed mark.");
-        }
+            Destroy(trackMark, despawnTime);
+        } 
     }
 }
