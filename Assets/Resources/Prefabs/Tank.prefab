@@ -5016,6 +5016,7 @@ MonoBehaviour:
   damagePerShot: 20
   timeBetweenBullets: 0.15
   range: 100
+  laserPrefab: {fileID: 1263183662712479510, guid: 0dd94410d666e444fb4f7b7e829db157, type: 3}
 --- !u!1 &6459529630843034992
 GameObject:
   m_ObjectHideFlags: 0
