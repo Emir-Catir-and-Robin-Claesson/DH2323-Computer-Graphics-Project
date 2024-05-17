@@ -213,7 +213,7 @@ public class TankController : MonoBehaviour
             position.y = -0.1f;
             Vector3 tankRotation = transform.rotation.eulerAngles;
             Quaternion rotation = Quaternion.Euler(90, 0, 0);
-            rotation.SetLookRotation(-Vector3.up, spawnPoint.transform.up);
+            rotation.SetLookRotation(-Vector3.up, spawnPoint.transform.forward);
             GameObject trackMark = Instantiate(skidMarksPrefab, position, rotation);
             Destroy(trackMark, despawnTime);
         } 

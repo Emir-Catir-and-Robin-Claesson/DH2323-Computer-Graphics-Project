@@ -5281,7 +5281,7 @@ MonoBehaviour:
   m_TurnSpeed: 180
   m_WheelRotateSpeed: 180
   tank_trackMarks: []
-  skidMarksPrefab: {fileID: 0}
+  skidMarksPrefab: {fileID: 4999502681417226313, guid: 073d6c9adfb0cc443ad4fc7d18efc178, type: 3}
   despawnTime: 3
   xOffset: 0.1
   zOffset: 0.1
