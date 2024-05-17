@@ -8,12 +8,12 @@ public class SecondaryGunShoot : MonoBehaviour
     public int damagePerShot = 20;                  // The damage inflicted by each bullet.
     public float timeBetweenBullets = 0.15f;        // The time between each shot.
     public float range = 100f;                      // The distance the gun can fire.
+    public GameObject laserPrefab;                  // The laser prefab to be instantiated when the gun is fired.
 
     float timer;                                    // A timer to determine when to fire.
     Ray shootRay = new Ray();                       // A ray from the gun end forwards.
     RaycastHit shootHit;                            // A raycast hit to get information about what was hit.
     ParticleSystem gunParticles;                    // Reference to the particle system.
-    LineRenderer gunLine;                           // Reference to the line renderer.
     float effectsDisplayTime = 0.2f;                // The proportion of the timeBetweenBullets that the effects will display for.
     int hitMask;                                   // A layer mask so the raycast only hits rocks.
 
@@ -22,7 +22,6 @@ public class SecondaryGunShoot : MonoBehaviour
     {
         // Set up the references.
         gunParticles = GetComponent<ParticleSystem>();
-        gunLine = GetComponent<LineRenderer>();
         hitMask = LayerMask.GetMask("Rock", "Enemy");
     }
 
@@ -38,22 +37,7 @@ public class SecondaryGunShoot : MonoBehaviour
             // ... shoot the gun.
             Shoot();
         }
-
-        // If the timer has exceeded the proportion of timeBetweenBullets that the effects should be displayed for...
-        if (timer >= timeBetweenBullets * effectsDisplayTime)
-        {
-            // ... disable the effects.
-            DisableEffects();
-        }
     }
-
-
-    public void DisableEffects()
-    {
-        // Disable the line renderer and the light.
-        gunLine.enabled = false;
-    }
-
 
     void Shoot()
     {
@@ -65,8 +49,6 @@ public class SecondaryGunShoot : MonoBehaviour
         gunParticles.Play();
 
         // Enable the line renderer and set it's first position to be the end of the gun.
-        gunLine.enabled = true;
-        gunLine.SetPosition(0, transform.position);
 
         // Set the shootRay so that it starts at the end of the gun and points forward from the barrel.
         shootRay.origin = transform.position;
@@ -77,18 +59,32 @@ public class SecondaryGunShoot : MonoBehaviour
         // set the second position of the line renderer to the maximal raycast range.
 
         // Your code here.
-        if(Physics.Raycast(shootRay, out shootHit, range, hitMask))
+        var laserEndPos = transform.position + shootRay.direction * range;
+        if (Physics.Raycast(shootRay, out shootHit, range, hitMask))
         {
-            gunLine.SetPosition(1, shootHit.point);
+            laserEndPos = shootHit.point;
 
-            if(shootHit.collider.tag == "Enemy")
+            if (shootHit.collider.tag == "Enemy")
             {
                 Destroy(shootHit.collider.gameObject);
+                Quaternion rotation = Quaternion.Euler(0, 0, 0);
             }
         }
-        else
-        {
-            gunLine.SetPosition(1, shootRay.origin + shootRay.direction * range);
-        }
+
+        //Find the middle point of the tank and the hitpoint and create the laser there
+        var laserMidPoint = (transform.position + laserEndPos) / 2;
+        var laserObject = Instantiate(laserPrefab, laserMidPoint, laserPrefab.transform.rotation);
+
+        // Scale the laser object so it fits between the tank and the hitpoint
+        laserObject.transform.localScale = new Vector3(laserObject.transform.localScale.x,
+                                                        Vector3.Distance(transform.position, laserEndPos)/2,
+                                                        laserObject.transform.localScale.z);
+        // Rotate the laser object so it points from the tank to the hitpoint and then make it lay flat
+        laserObject.transform.LookAt(laserEndPos);
+        laserObject.transform.Rotate(90, 0, 0, Space.Self);
+
+        //Destroy the laser after a short time
+        Destroy(laserObject, effectsDisplayTime);
+
     }
 }

@@ -18,6 +18,7 @@ public class TankController : MonoBehaviour
     public float xOffset = 0.1f;
     public float zOffset = 0.1f;
     
+
     private Rigidbody m_Rigidbody;              // Reference used to move the tank.
     private string m_MovementAxisName;          // The name of the input axis for moving forward and back.
     private string m_TurnAxisName;              // The name of the input axis for turning.
@@ -28,16 +29,7 @@ public class TankController : MonoBehaviour
     private List<GameObject> m_wheels = new List<GameObject>();
     private GameObject m_turret;
     private float camRayLength = 100f;          // The length of the ray from the camera into the scene.
-    
-    private List<GameObject> m_orugas = new List<GameObject>();
-    private List<GameObject> m_trackMarkpawnPoints = new List<GameObject>();
-    private List<float> trackMarksTimeStamp = new List<float>();
-    private Queue<GameObject> trackMarksQueue = new Queue<GameObject>();
-
-    private float pollingTime = 2;
-    private float timeLastPoll;
-
-
+    private List<ParticleSystem> wheelDustParticleSystems = new List<ParticleSystem>(); // List of wheel dust particle systems
 
     private void Awake()
     {
@@ -75,6 +67,13 @@ public class TankController : MonoBehaviour
 
         }
         timeLastPoll = Time.time;
+        
+        foreach (var wheel in m_wheels)
+        {
+            var particleSystem = wheel.GetComponentInChildren<ParticleSystem>();
+            if (particleSystem is not null)
+                wheelDustParticleSystems.Add(particleSystem);
+        }
     }
 
     // Start is called before the first frame update
@@ -128,6 +127,30 @@ public class TankController : MonoBehaviour
 
         // Apply this movement to the rigidbody's position.
         m_Rigidbody.MovePosition(m_Rigidbody.position + movement);
+
+        //Create dust particles
+        if (m_MovementInputValue != 0)
+        {
+            //foreach (var wheel in m_wheels)
+            //{
+            //    GameObject explosion = Instantiate(tankDust, wheel.transform.position, transform.rotation);
+            //    Destroy(explosion, explosion.GetComponent<ParticleSystem>().main.startLifetimeMultiplier);
+            //}
+
+            foreach (var wheelDustParticleSystem in wheelDustParticleSystems)
+            {
+                if (!wheelDustParticleSystem.isPlaying)
+                    wheelDustParticleSystem.Play();
+            }
+        }
+        else
+        {
+            foreach (var wheelDustParticleSystem in wheelDustParticleSystems)
+            {
+                if (wheelDustParticleSystem.isPlaying)
+                    wheelDustParticleSystem.Stop();
+            }
+        }
     }
 
 

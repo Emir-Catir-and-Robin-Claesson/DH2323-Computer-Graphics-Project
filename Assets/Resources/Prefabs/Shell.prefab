@@ -128,4 +128,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 20d2e7b08941da44b9f8c51b38fc489d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  explosionParticlesPrefab: {fileID: 113367890196324030, guid: ea1f415eafc5b8f4cb2ebb99566083c0, type: 3}
+  explosionParticlesPrefab: {fileID: 4141259930550476521, guid: d51383c45a3db204cb70db7ae7bd27c7, type: 3}

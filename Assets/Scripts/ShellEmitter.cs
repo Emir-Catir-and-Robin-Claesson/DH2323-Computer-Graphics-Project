@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Video;
 
 public class ShellEmitter : MonoBehaviour {
 
@@ -8,14 +9,18 @@ public class ShellEmitter : MonoBehaviour {
     public float m_MaxLaunchForce = 45f;        // The force given to the shell if the fire button is held for the max charge time.
     public float m_MaxChargeTime = 0.75f;       // How long the shell can charge for before it is fired at max force.
 
+    public GameObject smokeBurstParticlesPrefab; //Smoke effect when the shell is fired
+
     private GameObject shellPrefab;
     private float m_ChargeSpeed;                // How fast the launch force increases, based on the max charge time.
     private bool m_Fired;                       // Whether or not the shell has been launched with this button press.
     private float m_CurrentLaunchForce;         // The force that will be given to the shell when the fire button is released.
+    private Rigidbody tankRigidBody;             // Reference to the rigidbody of the tank.
 
     void Awake()
     {
         shellPrefab = Resources.Load<GameObject>("Prefabs/Shell");
+        tankRigidBody = GetComponentInParent<Rigidbody>();
     }
 
     
@@ -69,6 +74,15 @@ public class ShellEmitter : MonoBehaviour {
 
             // Set the shell's life time to be 3 second. After that, the shell will be destroyed.
             Destroy(shellInstance, 3f);
+
+            //Create the burst smoke effect from the main gun
+            GameObject explosion = (GameObject)Instantiate(smokeBurstParticlesPrefab, transform.position, transform.rotation);
+            Destroy(explosion, explosion.GetComponent<ParticleSystem>().main.startLifetimeMultiplier);
+
+            //Apply the recoil force to the tank
+            var forceDirection = -transform.forward * m_CurrentLaunchForce * 0.01f;
+            tankRigidBody.AddForce(forceDirection , ForceMode.Impulse);
+
         }
     }
 }
