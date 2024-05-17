@@ -71,14 +71,20 @@ public class SecondaryGunShoot : MonoBehaviour
             }
         }
 
-        //Find the middle point of the laser 
+        //Find the middle point of the tank and the hitpoint and create the laser there
         var laserMidPoint = (transform.position + laserEndPos) / 2;
         var laserObject = Instantiate(laserPrefab, laserMidPoint, laserPrefab.transform.rotation);
+
+        // Scale the laser object so it fits between the tank and the hitpoint
         laserObject.transform.localScale = new Vector3(laserObject.transform.localScale.x,
                                                         Vector3.Distance(transform.position, laserEndPos)/2,
                                                         laserObject.transform.localScale.z);
+        // Rotate the laser object so it points from the tank to the hitpoint and then make it lay flat
         laserObject.transform.LookAt(laserEndPos);
         laserObject.transform.Rotate(90, 0, 0, Space.Self);
+
+        //Destroy the laser after a short time
         Destroy(laserObject, effectsDisplayTime);
+
     }
 }
