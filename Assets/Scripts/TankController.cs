@@ -83,7 +83,6 @@ public class TankController : MonoBehaviour
         m_MovementInputValue = Input.GetAxis(m_MovementAxisName);
         m_TurnInputValue = Input.GetAxis(m_TurnAxisName);
         m_MouseInputValue = Input.mousePosition;
-        IsMoving();
     }
 
     private void FixedUpdate()
